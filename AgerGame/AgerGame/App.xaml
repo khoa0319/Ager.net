@@ -1,0 +1,18 @@
+﻿<Application x:Class="AgerGame.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AgerGame"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!--Font Start2P-->
+        <Style x:Key="Start2P">
+            <Setter Property="TextElement.FontFamily"
+                    Value="/Resource/Font/#Press Start 2P"/>
+        </Style>
+        <!--Font VCR OSD Mono-->
+        <Style x:Key="VCR">
+            <Setter Property="TextElement.FontFamily"
+                    Value="/Resource/Font/#VCR OSD Mono"/>
+        </Style>
+    </Application.Resources>
+</Application>
