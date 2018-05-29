@@ -407,6 +407,7 @@ namespace AgerGame.Views
                 {
                     ((Bot)players[1]).IsAlive = false;
                     players[0].PlayerImg.Width = players[0].PlayerImg.Height = players[0].WidthAndHeight -= players[1].WidthAndHeight / 2;
+                    players[0].Speed += players[1].Speed / 5;
                     Canvas.SetLeft(players[1].PlayerImg, 90000);
                     Canvas.SetTop(players[1].PlayerImg, 90000);
                     players[1].Speed = 0;
@@ -426,6 +427,7 @@ namespace AgerGame.Views
                 {
                     ((Bot)players[2]).IsAlive = false;
                     players[0].PlayerImg.Width = players[0].PlayerImg.Height = players[0].WidthAndHeight -= players[2].WidthAndHeight / 2;
+                    players[0].Speed += players[2].Speed / 5;
                     Canvas.SetLeft(players[2].PlayerImg, 90000);
                     Canvas.SetTop(players[2].PlayerImg, 90000);
                     players[2].Speed = 0;
@@ -444,6 +446,7 @@ namespace AgerGame.Views
                 {
                     ((Bot)players[3]).IsAlive = false;
                     players[0].PlayerImg.Width = players[0].PlayerImg.Height = players[0].WidthAndHeight -= players[3].WidthAndHeight / 2;
+                    players[0].Speed += players[3].Speed / 5;
                     Canvas.SetLeft(players[3].PlayerImg, 90000);
                     Canvas.SetTop(players[3].PlayerImg, 90000);
                     players[3].Speed = 0;
@@ -462,6 +465,7 @@ namespace AgerGame.Views
                 {
                     ((Bot)players[4]).IsAlive = false;
                     players[0].PlayerImg.Width = players[0].PlayerImg.Height = players[0].WidthAndHeight -= players[4].WidthAndHeight / 2;
+                    players[0].Speed += players[4].Speed / 5;
                     Canvas.SetLeft(players[4].PlayerImg, 90000);
                     Canvas.SetTop(players[4].PlayerImg, 90000);
                     players[4].Speed = 0;
@@ -479,7 +483,7 @@ namespace AgerGame.Views
             gameTime.Stop();
         }
 
-        public bool BotAllDead() => ((Bot)players[1]).IsAlive == false && ((Bot)players[2]).IsAlive == false && ((Bot)players[3]).IsAlive == false && ((Bot)players[4]).IsAlive == false;
+        //public bool BotAllDead() => ((Bot)players[1]).IsAlive == false && ((Bot)players[2]).IsAlive == false && ((Bot)players[3]).IsAlive == false && ((Bot)players[4]).IsAlive == false;
 
     }
 }
