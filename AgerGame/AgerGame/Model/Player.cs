@@ -23,7 +23,7 @@ namespace AgerGame.Model
                 Height = WidthAndHeight,
                 Fill = Brushes.Aqua,
                 StrokeThickness = 2
-        };            
+            };  
         }
     }
 }
