@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,13 +49,29 @@ namespace AgerGame.ViewModel
         }
         public static Food[] CreateFoods()
         {
-            Food[] arr = new Food[90];
+            Food[] arr = new Food[900];
             int i;
-            for (i = 0; i < 90; i++)
+            for (i = 0; i < 900; i++)
             {
                 arr[i] = new Food(); 
             }
             return arr;
+        }
+    }
+
+    public class Params
+    {
+        public Thread ThreadRun { get; set; }
+        public int Index { get; set; }
+        public int StartIndex { get; set; }
+        public int EndIndex { get; set; }
+
+        public Params(Thread run, int sta, int end, int index)
+        {
+            ThreadRun = run;
+            StartIndex = sta;
+            EndIndex = end;
+            Index = index;
         }
     }
 }

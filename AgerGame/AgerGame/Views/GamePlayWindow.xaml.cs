@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,10 +62,12 @@ namespace AgerGame.Views
 
         //Count Death
         private int dCount = 0;
+        // ThreadState
+        int[] thStates;
         public GamePlayWindow()
         {
             InitializeComponent();
-
+            thStates = new int[2];
             gameOver = new GameOver(this)
             { Visibility = Visibility.Hidden };
 
@@ -83,6 +86,8 @@ namespace AgerGame.Views
             players[0] = Util.CreatePlayer();
             foods = Util.CreateFoods();
             CreateAI();
+            PAIRect = new Rect[players.Length];
+            foodsRect = new Rect[foods.Length];
             //bo vao mang add
             GamePlayCanvas.Children.Add(players[0].PlayerImg);
             GamePlayCanvas.Children.Add(players[1].PlayerImg);
@@ -124,6 +129,9 @@ namespace AgerGame.Views
             };
             gameTime.Tick += (sender, e) =>
             {
+                if (dCount == 4)
+                    CheckGameOver();
+
                 AIMove();
 
                 PlayerMove();
@@ -134,10 +142,10 @@ namespace AgerGame.Views
 
                 PlayerCollisionAI();
 
-                FoodCollisionPlayerAI();
+                FoodCollisionPlayer();
 
-                if (dCount == 4)
-                    CheckGameOver();
+                FoodCollisionBot();
+                
             };
         }
 
@@ -313,23 +321,42 @@ namespace AgerGame.Views
         // Create Food Rect
         public void SetFoodRects()
         {
-            
-            int fLength = foods.Length;
-            foodsRect = new Rect[fLength];
-            for (int i = 0; i < fLength; i++)
+            //int fLength = foods.Length;
+            Thread t1 = new Thread(new ParameterizedThreadStart(SetRects));
+            thStates[0] = 0;
+            t1.Priority = ThreadPriority.AboveNormal;
+            t1.Start(new Params(t1, 0, 449, 0));           
+
+            Thread t2 = new Thread(new ParameterizedThreadStart(SetRects));
+            thStates[1] = 0;
+            t2.Priority = ThreadPriority.AboveNormal;
+            t2.Start(new Params(t2, 450, 899, 1));
+
+            for (int i = 0; i < thStates.Length; i++)
             {
-                foods[i].RectX = Canvas.GetLeft(foods[i].Img);
-                foods[i].RectY = Canvas.GetTop(foods[i].Img);
-                Rect foodRect = Util.CreateRect(foods[i].RectX, foods[i].RectY, foods[i].Img.ActualWidth, foods[i].Img.ActualHeight);
+                while (thStates[i] == 0); //chờ
+            }
+        }
+
+        private void SetRects(object obj)
+        {
+
+            Params p = (Params)obj;
+            for (int i = p.StartIndex; i <= p.EndIndex; i++)
+            {
+                foods[i].RectX = foods[i].PosX;
+                foods[i].RectY = foods[i].PosY;
+                Rect foodRect = Util.CreateRect(foods[i].RectX, foods[i].RectY, foods[i].WidthAndHeight, foods[i].WidthAndHeight);
                 foodsRect[i] = foodRect;
             }
+            thStates[p.Index] = 1;
         }
         //Create Player, Bots rects
         public void SetPlayerAIRect()
         {
             int pLength = players.Length;
             double rectX, rectY, tWidth, tHeight;
-            PAIRect = new Rect[pLength];            
+            
             for (int i = 0; i < pLength; i++)
             {
                 rectX = Canvas.GetLeft(players[i].PlayerImg);
@@ -340,15 +367,37 @@ namespace AgerGame.Views
                 PAIRect[i] = rect;
             }
         }
+        public void FoodCollisionPlayer()
+        {
+            int fCount = foods.Length;
+            Random rnd, r;
+            for (int j = 0; j < fCount; j++)
+            {
+                rnd = new Random();
+                r = new Random();
+                if (PAIRect[0].IntersectsWith(foodsRect[j]))
+                {
+                    foods[j].PosX = rnd.Next(10, (int)WindowWidth - 10);
+                    foods[j].PosY = rnd.Next(10, (int)WindowHeight - 10);
+                    foods[j].Img.Fill = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255), (byte)r.Next(1, 255), (byte)r.Next(1, 233)));
 
-        public void FoodCollisionPlayerAI()
+                    Canvas.SetLeft(foods[j].Img, foods[j].PosX);
+                    Canvas.SetTop(foods[j].Img, foods[j].PosY);
+
+                    players[0].PlayerImg.Width = players[0].PlayerImg.Height = players[0].WidthAndHeight++;
+                    players[0].Speed = players[0].Speed < 0.01 ? 0.01 : players[0].Speed - 0.00025;
+                }
+            }
+        }
+
+        public void FoodCollisionBot()
         {
             int fCount = foods.Length;
             int pCount = players.Length;
             Random rnd, r;
-            for (int i = 0; i < pCount; i++)
+            for (int i = 1; i < pCount; i++)
             {
-                if (i < 1)
+                if (((Bot)players[i]).IsAlive)
                 {
                     for (int j = 0; j < fCount; j++)
                     {
@@ -364,30 +413,7 @@ namespace AgerGame.Views
                             Canvas.SetTop(foods[j].Img, foods[j].PosY);
 
                             players[i].PlayerImg.Width = players[i].PlayerImg.Height = players[i].WidthAndHeight++;
-                            players[i].Speed = players[i].Speed < 0.01 ? 0.01 : players[i].Speed - 0.025;
-                        }
-                    }
-                }
-                else
-                {
-                    if (((Bot)players[i]).IsAlive)
-                    {
-                        for (int j = 0; j < fCount; j++)
-                        {
-                            rnd = new Random();
-                            r = new Random();
-                            if (PAIRect[i].IntersectsWith(foodsRect[j]))
-                            {
-                                foods[j].PosX = rnd.Next(10, (int)WindowWidth - 10);
-                                foods[j].PosY = rnd.Next(10, (int)WindowHeight - 10);
-                                foods[j].Img.Fill = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255), (byte)r.Next(1, 255), (byte)r.Next(1, 233)));
-
-                                Canvas.SetLeft(foods[j].Img, foods[j].PosX);
-                                Canvas.SetTop(foods[j].Img, foods[j].PosY);
-
-                                players[i].PlayerImg.Width = players[i].PlayerImg.Height = players[i].WidthAndHeight++;
-                                players[i].Speed = players[i].Speed < 0.01 ? 0.01 : players[i].Speed - 0.025;
-                            }
+                            players[i].Speed = players[i].Speed < 0.01 ? 0.01 : players[i].Speed - 0.00025;
                         }
                     }
                 }
@@ -463,7 +489,7 @@ namespace AgerGame.Views
                 }
                 else
                 {
-                    ((Bot)players[4]).IsAlive = false;
+                    (players[4] as Bot).IsAlive = false;
                     players[0].PlayerImg.Width = players[0].PlayerImg.Height = players[0].WidthAndHeight -= players[4].WidthAndHeight / 2;
                     players[0].Speed += players[4].Speed / 5;
                     Canvas.SetLeft(players[4].PlayerImg, 90000);
