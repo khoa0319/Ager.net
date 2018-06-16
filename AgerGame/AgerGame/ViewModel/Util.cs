@@ -49,9 +49,9 @@ namespace AgerGame.ViewModel
         }
         public static Food[] CreateFoods()
         {
-            Food[] arr = new Food[900];
+            Food[] arr = new Food[200];
             int i;
-            for (i = 0; i < 900; i++)
+            for (i = 0; i < 200; i++)
             {
                 arr[i] = new Food(); 
             }

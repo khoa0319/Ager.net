@@ -325,12 +325,12 @@ namespace AgerGame.Views
             Thread t1 = new Thread(new ParameterizedThreadStart(SetRects));
             thStates[0] = 0;
             t1.Priority = ThreadPriority.AboveNormal;
-            t1.Start(new Params(t1, 0, 449, 0));           
+            t1.Start(new Params(t1, 0, 99, 0));           
 
             Thread t2 = new Thread(new ParameterizedThreadStart(SetRects));
             thStates[1] = 0;
             t2.Priority = ThreadPriority.AboveNormal;
-            t2.Start(new Params(t2, 450, 899, 1));
+            t2.Start(new Params(t2, 100, 199, 1));
 
             for (int i = 0; i < thStates.Length; i++)
             {
